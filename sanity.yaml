@@ -1,0 +1,10 @@
+---
+- hosts: all
+  connection: ssh
+  remote_user: sysops
+  become: yes
+  become_method: sudo
+  gather_facts: yes
+  tasks:
+    - name: Run pre_check.sh script
+      script: /home/syspos/pre_check.sh
