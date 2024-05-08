@@ -1,0 +1,15 @@
+---
+- hosts: all
+  tasks:
+    - name: Print separator and display prechecks df.txt file
+      shell: |
+        echo "******************************"
+        cat {{ inventory_hostname }}_prechecks/df.txt
+        echo "##############################"
+        df -Th
+        echo "******************************"
+      register: prechecks_output
+
+    - name: Display prechecks output
+      debug:
+        var: prechecks_output.stdout_lines
