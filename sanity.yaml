@@ -7,4 +7,4 @@
   gather_facts: yes
   tasks:
     - name: Run pre_check.sh script
-      script: /home/syspos/pre_check.sh
+      shell: /home/syspos/pre_check.sh
