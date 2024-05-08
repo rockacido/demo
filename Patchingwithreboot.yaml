@@ -1,0 +1,37 @@
+---
+- hosts: all
+  connection: ssh
+  remote_user: sysops
+  become: yes
+  become_method: sudo
+  gather_facts: yes
+  tasks:
+    - name: Update packages (Debian/Ubuntu)
+      shell: "apt-get update && apt-get upgrade -y"
+      args:
+        executable: /bin/bash
+      when: ansible_os_family == 'Debian'
+
+    - name: Update packages (SUSE)
+      shell: "zypper --non-interactive update"
+      args:
+        executable: /bin/bash
+      when: ansible_os_family == 'SUSE'
+
+    - name: Update packages using yum
+      shell: yum update -y
+      register: yum_update_result
+      ignore_errors: yes
+
+    - name: Retry with additional options if initial update fails
+      when: yum_update_result.rc != 0
+      block:
+        - name: Update packages using yum with additional options
+          shell: yum update --skip-broken --nobest --nogpgcheck -y
+
+    - name: Run security update with --allowerasing if previous updates fail
+      when: yum_update_result.rc != 0
+      shell: sudo yum update --security --allowerasing -y
+
+    - name: rebooting hosts
+      reboot:
